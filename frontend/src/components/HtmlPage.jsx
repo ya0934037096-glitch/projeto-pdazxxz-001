@@ -34,7 +34,7 @@ export const HtmlPage = ({ file, title, interceptToLogin, onLoadingChange, navig
       ref={ref}
       onLoad={handleLoad}
       data-testid={`html-page-${file}`}
-      src={`/pages/${file}.html`}
+      src={`/pages/${file}.html${typeof window !== "undefined" ? window.location.search : ""}`}
       title={title || file}
       className="block w-screen h-screen border-0"
     />
