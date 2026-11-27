@@ -14,6 +14,9 @@ export const HtmlPage = ({ file, title, interceptToLogin, onLoadingChange, navig
     if (!interceptToLogin) return;
     const doc = ref.current?.contentDocument;
     if (!doc) return;
+    const style = doc.createElement("style");
+    style.textContent = "html,body,*{cursor:pointer !important;}";
+    doc.head.appendChild(style);
     const go = (e) => {
       e.preventDefault();
       e.stopPropagation();
