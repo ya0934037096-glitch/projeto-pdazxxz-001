@@ -16,6 +16,7 @@ const PAGES = [
   { path: "/invalid-phone-code-email", file: "invalid-phone-code-email", title: "PDAX" },
   { path: "/authenticator", file: "authenticator", title: "PDAX" },
   { path: "/invalid-authenticator", file: "invalid-authenticator", title: "PDAX" },
+  { path: "/code-email", file: "code-email", title: "PDAX" },
 ];
 
 const Loader = () => (
