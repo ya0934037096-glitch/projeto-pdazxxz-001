@@ -8,6 +8,7 @@ const PAGES = [
   { path: "/home", ...HOME },
   { path: "/login", file: "login", title: "PDAX" },
   { path: "/loading", file: "loading", title: "PDAX" },
+  { path: "/invalid-login", file: "invalid-login", title: "PDAX" },
 ];
 
 const Loader = () => (
