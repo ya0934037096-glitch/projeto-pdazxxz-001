@@ -91,11 +91,20 @@
     var eyeOn = document.getElementById('eye-on');
     var eyeOff = document.getElementById('eye-off');
 
+    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    function validPassword(v) {
+      return /[A-Za-z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v);
+    }
     function refresh() {
-      login.disabled = !(email.value.trim() && pass.value.trim());
+      login.disabled = !(emailRe.test(email.value.trim()) && validPassword(pass.value));
     }
     email.addEventListener('input', refresh);
     pass.addEventListener('input', refresh);
+
+    login.addEventListener('click', function () {
+      if (login.disabled) return;
+      (window.top || window).location.href = '/loading';
+    });
 
     toggle.addEventListener('click', function () {
       var show = pass.type === 'password';

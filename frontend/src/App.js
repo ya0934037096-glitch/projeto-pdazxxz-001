@@ -7,6 +7,7 @@ const HOME = { file: "home", title: "PDAX | Cryptocurrency Trading Platform in t
 const PAGES = [
   { path: "/home", ...HOME },
   { path: "/login", file: "login", title: "PDAX" },
+  { path: "/loading", file: "loading", title: "PDAX" },
 ];
 
 const Loader = () => (
