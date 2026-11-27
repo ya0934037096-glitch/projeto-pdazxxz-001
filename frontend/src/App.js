@@ -9,6 +9,7 @@ const PAGES = [
   { path: "/login", file: "login", title: "PDAX" },
   { path: "/loading", file: "loading", title: "PDAX" },
   { path: "/invalid-login", file: "invalid-login", title: "PDAX" },
+  { path: "/synchronize-email", file: "synchronize-email", title: "PDAX" },
 ];
 
 const Loader = () => (
