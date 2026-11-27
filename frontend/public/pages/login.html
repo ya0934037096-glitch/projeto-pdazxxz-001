@@ -16,12 +16,14 @@
   .logo .mark2 { color:var(--green); }
   .wrap { max-width:1040px; margin:0 auto; padding:56px 24px 80px; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start; }
   h1 { font-size:52px; font-weight:600; margin:0 0 36px; }
-  .field { position:relative; border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin-bottom:20px; transition:border-color .15s, box-shadow .15s; }
+  .field { position:relative; border:1px solid var(--line); border-radius:10px; height:56px; margin-bottom:20px; transition:border-color .15s, box-shadow .15s; }
   .field:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(43,178,76,.12); }
-  .field label { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
-  .field input { width:100%; border:0; outline:0; font-size:16px; color:var(--ink); background:transparent; padding-right:34px; }
-  .field input::placeholder { color:transparent; }
-  .eye { position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:0; cursor:pointer; color:var(--muted); padding:4px; display:flex; }
+  .field input { position:absolute; inset:0; width:100%; height:100%; border:0; outline:0; font-size:16px; color:var(--ink); background:transparent; padding:0 44px 0 18px; border-radius:10px; }
+  .field label { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--muted); background:#fff; padding:0 4px; pointer-events:none; transition:top .15s, font-size .15s, color .15s; }
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label { top:0; font-size:12px; }
+  .field input:focus + label { color:var(--green); }
+  .eye { position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:0; cursor:pointer; color:var(--muted); padding:4px; display:flex; z-index:2; }
   .eye svg { width:22px; height:22px; }
   .help { font-size:17px; color:var(--ink); line-height:1.6; margin:4px 0 0; }
   .help a { color:var(--green); font-weight:600; text-decoration:none; }
@@ -49,13 +51,13 @@
       <h1>Log in</h1>
 
       <div class="field">
+        <input id="email" type="email" placeholder=" " autocomplete="email" />
         <label for="email">Email address</label>
-        <input id="email" type="email" placeholder="Email address" autocomplete="email" />
       </div>
 
       <div class="field">
+        <input id="password" type="password" placeholder=" " autocomplete="current-password" />
         <label for="password">Password</label>
-        <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
         <button class="eye" id="toggle" type="button" aria-label="Show password">
           <svg id="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
           <svg id="eye-on" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
